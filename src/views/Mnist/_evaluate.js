@@ -15,7 +15,7 @@ export default {
             return [preds, labels]
         },
         async showAccuracy(model, data) {
-            const [preds, labels] = doPrediction(model, data)
+            const [preds, labels] = this.doPrediction(model, data)
             const classAccuracy = await tfvis.metrics.perClassAccuracy(labels, preds)
             const container = {name: 'Accuracy', tab: 'Evaluation'}
             tfvis.show.perClassAccuracy(container, classAccuracy, classNames)
@@ -24,7 +24,7 @@ export default {
         },
 
         async showConfusion(model, data) {
-            const [preds, labels] = doPrediction(model, data)
+            const [preds, labels] = this.doPrediction(model, data)
             const confusionMatrix = await tfvis.metrics.confusionMatrix(labels, preds)
             const container = {name: 'Confusion Matrix', tab: 'Evaluation'}
             tfvis.render.confusionMatrix(container, {values: confusionMatrix, tickLabels: classNames})

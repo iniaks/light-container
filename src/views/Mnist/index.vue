@@ -46,9 +46,11 @@
                 const data = new MnistData()
                 await data.load()
                 await this.showExamples(data)
-                const model = this.getModel()
+                const model = await tf.loadLayersModel('localstorage://mnist-model')
+                // const model = this.getModel()
                 tfvis.show.modelSummary({name: 'Model Architecture', tab: 'Model'}, model)
-                await this.train(model, data)
+                // await this.train(model, data)
+                // await model.save('localstorage://mnist-model')
                 await this.showAccuracy(model, data)
                 await this.showConfusion(model, data)
             }
