@@ -22,6 +22,11 @@ const routes = [
     path: '/mnist',
     name: 'mnist',
     component: () => import('../views/Mnist/index.vue')
+  },
+  {
+    path: '/knn',
+    name: 'knn',
+    component: () => import('../views/Knn/index.vue')
   }
 ]
 
