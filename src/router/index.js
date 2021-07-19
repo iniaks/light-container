@@ -27,6 +27,11 @@ const routes = [
     path: '/knn',
     name: 'knn',
     component: () => import('../views/Knn/index.vue')
+  },
+  {
+    path: '/stock',
+    name: 'stock',
+    component: () => import('../views/Stock/index.vue')
   }
 ]
 
