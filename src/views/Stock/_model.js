@@ -12,6 +12,7 @@ export default {
             }))
 
             model.add(tf.layers.dense({
+                units: 7,
                 activation: 'softmax'
             }))
           

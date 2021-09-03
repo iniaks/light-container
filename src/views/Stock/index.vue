@@ -46,9 +46,11 @@
         },
         methods: {
             view (stock) {
-                const t = this.formatX(stock)
-                console.log(t)
-                t.print()
+                const x = this.formatX(stock)
+                const y = this.formatY(stock)
+                // console.log(t)
+                x.print()
+                y.print()
             },
             train () {
                 this.nextTrainBatch(this.list, 0)
