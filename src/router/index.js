@@ -10,6 +10,16 @@ const routes = [
     name: 'Home',
     component: () => import('../views/Diagram/index.vue')
   },
+  {
+    path: '/combination/:name',
+    name: 'combination',
+    component: () => import('../views/Combination/index.vue')
+  },
+  {
+    path: '/create/:group',
+    name: 'create',
+    component: () => import('../views/Combination/index.vue')
+  }
   //{
     // path: '/about',
     // name: 'About',

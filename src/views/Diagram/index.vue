@@ -20,11 +20,13 @@
                 <div
                 class='group-graph'
                 v-for='item in combinations[group._id]'
-                :key='`combination-${item.order}`'>
+                :key='`combination-${item.order}`'
+                @click='view(item.name)'>
                     <div class='combination-info'>
+                        <div class='combination-order'>{{item.order}}</div>
                         <div class='combination-graph'>
-                            <div v-for='(line, index) in item.secondary.lines' :key='`up-${index}`' class='combination-graph__line'/>
-                            <div v-for='(line, index) in item.primary.lines' :key='`down-${index}`' class='combination-graph__line'/>
+                            <div v-for='(line, index) in item.secondary.lines' :key='`up-${index}`' :class='["combination-graph__line", line ? "" : "negative"]'/>
+                            <div v-for='(line, index) in item.primary.lines' :key='`down-${index}`' :class='["combination-graph__line", line ? "" : "negative"]'/>
                         </div>
                         <div class='combination-subject'>
                             <div style='margin-bottom: 12px'>上{{item.secondary.name}}</div>
@@ -32,6 +34,12 @@
                         </div>
                     </div>
                     <div>{{item.secondary.shape}}{{item.primary.shape}} {{item.name}}</div>
+                </div>
+                <div
+                class='group-graph'
+                v-if='!combinations[group._id] || combinations[group._id].length < 8'
+                @click='create(group._id)'>
+                    + 添加
                 </div>
             </div>
         </div>
@@ -61,13 +69,19 @@
                 const that = this
                 axios.get('http://local.api.spider.com/diagram/combinations').then((res => {
                     res.data.result.forEach(combination => {
-                        if (that.combinations[combination.group]) that.combinations[combination.group].push(combination)
-                        else that.combinations[combination.group] = [combination]
+                        if (!that.combinations[combination.group]) that.combinations[combination.group] = []
+                        that.combinations[combination.group][combination.group_index] = combination
                     })
                     that.combinations = Object.assign({}, that.combinations)
                 })).catch(err => {
                     return err
                 })
+            },
+            view (name) {
+                window.open(`/combination/${name}`)
+            },
+            create (group) {
+                window.open(`/create/${group}`)
             }
         },
         mounted () {
@@ -91,8 +105,11 @@
         display: flex;
         align-items: center;
         font-size: 10pt;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
         .group-name {
             width: 90px;
+            box-sizing: border-box;
             text-align: center;
         }
     }
@@ -102,16 +119,29 @@
         height: 120px;
         box-sizing: border-box;
         text-align: center;
-        margin-right: 10px;
         border-right: 1px solid #eee;
     }
     .group-graph {
         padding: 10px;
+        padding-top: 20px;
         box-sizing: border-box;
         width: 90px;
         height: 120px;
         text-align: center;
         border-right: 1px solid #eee;
+        position: relative;
+        cursor: pointer;
+        transition: all ease .3s;
+        &:hover {
+            background: #f7f8ff;
+        }
+        .combination-order {
+            font-size: 10pt;
+            color: #999;
+            position: absolute;
+            right: 5px;
+            top: 5px;
+        }
     }
     .combination-info {
         display: flex;
@@ -128,6 +158,16 @@
             height: 5px;
             background: #333;
             margin-bottom: 5px;
+            position: relative;
+            &.negative:before {
+                content: '';
+                background: #fff;
+                height: 5px;
+                width: 5px;
+                position: absolute;
+                left: 10px;
+                top: 0;
+            }
         }
     }
 </style>
