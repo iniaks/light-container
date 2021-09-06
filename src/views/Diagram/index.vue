@@ -48,6 +48,7 @@
 
 <script>
     import axios from 'axios'
+    import { API_HOST } from '@/store/config'
 
     export default {
         data () {
@@ -59,7 +60,7 @@
         methods: {
             init () {
                 const that = this
-                axios.get('http://local.api.spider.com/diagram/trigrams').then((res => {
+                axios.get(`${API_HOST}/diagram/trigrams`).then((res => {
                     that.trigrams = res.data.result
                 })).catch(err => {
                     return err
@@ -67,7 +68,7 @@
             },
             update () {
                 const that = this
-                axios.get('http://local.api.spider.com/diagram/combinations').then((res => {
+                axios.get(`${API_HOST}/diagram/combinations`).then((res => {
                     res.data.result.forEach(combination => {
                         if (!that.combinations[combination.group]) that.combinations[combination.group] = []
                         that.combinations[combination.group][combination.group_index] = combination

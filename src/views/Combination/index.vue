@@ -102,6 +102,7 @@
 
 <script>
     import axios from 'axios'
+    import { API_HOST } from '@/store/config'
 
     export default {
         data () {
@@ -156,7 +157,7 @@
         methods: {
             init () {
                 const that = this
-                axios.get('http://local.api.spider.com/diagram/trigrams').then((res => {
+                axios.get(`${API_HOST}/diagram/trigrams`).then((res => {
                     that.trigrams = res.data.result
                 })).catch(err => {
                     return err
@@ -164,7 +165,7 @@
             },
             update () {
                 const that = this
-                axios.get(`http://local.api.spider.com/diagram/combination?name=${this.$route.params.name}`).then((res => {
+                axios.get(`${API_HOST}/diagram/combination?name=${this.$route.params.name}`).then((res => {
                     const detail = res.data.result
                     for (let prop in that.info) {
                         that.info[prop] = detail[prop] !== undefined ? detail[prop] : ''
