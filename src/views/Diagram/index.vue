@@ -79,10 +79,12 @@
                 })
             },
             view (name) {
-                window.open(`/combination/${name}`)
+                this.$router.push({name: 'combination', params: {name: name}})
+                // window.open(`/combination/${name}`)
             },
             create (group) {
-                window.open(`/create/${group}`)
+                this.$router.push({name: 'create', params: {group: group}})
+                // window.open(`/create/${group}`)
             }
         },
         mounted () {
