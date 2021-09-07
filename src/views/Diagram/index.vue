@@ -38,7 +38,7 @@
                 <div
                 class='group-graph'
                 v-if='!combinations[group._id] || combinations[group._id].length < 8'
-                @click='create(group._id, combinations ? combinations[group._id].length : 0)'>
+                @click='create(group._id, combinations[group._id] ? combinations[group._id].length : 0)'>
                     + 添加
                 </div>
             </div>
