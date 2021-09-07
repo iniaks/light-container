@@ -215,6 +215,7 @@
             this.init()
             if (this.$route.name == 'create') {
                 this.info.group = this.$route.params.group
+                this.info.group_index = parseInt(this.$route.query.index)
             } else {
                 this.update()
             }

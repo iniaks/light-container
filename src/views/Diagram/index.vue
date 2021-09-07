@@ -38,7 +38,7 @@
                 <div
                 class='group-graph'
                 v-if='!combinations[group._id] || combinations[group._id].length < 8'
-                @click='create(group._id)'>
+                @click='create(group._id, combinations[group._id].length)'>
                     + 添加
                 </div>
             </div>
@@ -82,8 +82,8 @@
                 this.$router.push({name: 'combination', params: {name: name}})
                 // window.open(`/combination/${name}`)
             },
-            create (group) {
-                this.$router.push({name: 'create', params: {group: group}})
+            create (group, index) {
+                this.$router.push({name: 'create', params: {group: group}, query: {index: index}})
                 // window.open(`/create/${group}`)
             }
         },
