@@ -73,25 +73,25 @@
             <div v-for='(line, index) in line_texts' :key='`text-${index}`' class='line-item'>
                 <div class='line-item__version'>
                     今本：<br>
-                    <textarea v-model='line.stable' cols='30' rows="4"/>
+                    <textarea v-model='line.stable' cols='50' rows="10"/>
                 </div>
                 <div class='line-item__version'>
                     帛本：<br>
-                    <textarea v-model='line.silk' cols='30' rows="4"/>
+                    <textarea v-model='line.silk' cols='50' rows="10"/>
                 </div>
                 <div class='line-item__version'>
                     楚简：<br>
-                    <textarea v-model='line.slip' cols='30' rows="4"/>
+                    <textarea v-model='line.slip' cols='50' rows="10"/>
                 </div>
                 <div class='line-item__version'>
                     释义：<br>
-                    <textarea v-model='line.translation' cols='30' rows="4"/>
+                    <textarea v-model='line.translation' cols='50' rows="10"/>
                 </div>
             </div>
         </div>
         <div>
             注释：<br>
-            <textarea v-model='info.notes' cols="30" rows='6'/>
+            <textarea v-model='info.notes' cols="50" rows='10'/>
         </div>
 
         <div>
