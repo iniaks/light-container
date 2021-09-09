@@ -51,19 +51,19 @@
             <div class='line-item'>
                 <div class='line-item__version'>
                     今本：<br>
-                    <textarea v-model='info.description' rows="4"/>
+                    <textarea v-model='info.description' cols='50' rows="10"/>
                 </div>
                 <div class='line-item__version'>
                     帛本：<br>
-                    <textarea v-model='info.silk_description' rows="4"/>
+                    <textarea v-model='info.silk_description' cols='50' rows="10"/>
                 </div>
                 <div class='line-item__version'>
                     楚简：<br>
-                    <textarea v-model='info.slip_description' rows="4"/>
+                    <textarea v-model='info.slip_description' cols='50' rows="10"/>
                 </div>
                 <div class='line-item__version'>
                     卦辞释义：<br>
-                    <textarea v-model='info.description_translation' rows="4"/>
+                    <textarea v-model='info.description_translation' cols='50' rows="10"/>
                 </div>
             </div>
         </div>
