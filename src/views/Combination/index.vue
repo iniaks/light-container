@@ -203,7 +203,7 @@
                     lines,
                     translations: translations
                 }
-                axios.post('http://local.api.spider.com/diagram/combination', data).then(() => {
+                axios.post(`${API_HOST}/diagram/combination`, data).then(() => {
                     // that.update()
                     that.$router.push({name: 'home'})
                 }).catch(err => {
