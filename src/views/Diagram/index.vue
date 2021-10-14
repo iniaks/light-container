@@ -79,8 +79,8 @@
                 })
             },
             view (name) {
-                this.$router.push({name: 'combination', params: {name: name}})
-                // window.open(`/combination/${name}`)
+                // this.$router.push({name: 'combination', params: {name: name}})
+                window.open(`/combination/${name}`)
             },
             create (group, index) {
                 this.$router.push({name: 'create', params: {group: group}, query: {index: index}})
