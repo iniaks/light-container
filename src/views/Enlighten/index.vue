@@ -1,28 +1,30 @@
 <template>
-    <div class='diagram-container' v-if='result.current'>
+    <div>
         <p>动爻：{{result.change_index}}</p>
-        <div class='diagram-container__item'>
-            {{result.current.secondary.shape}}{{result.current.primary.shape}}
-            {{result.current.name}}
+        <div class='diagram-container' v-if='result.current'>
+            <div class='diagram-container__item'>
+                {{result.current.secondary.shape}}{{result.current.primary.shape}}
+                {{result.current.name}}
 
-            <p>{{result.current.description}}</p>
+                <p>{{result.current.description}}</p>
 
-            <div>
-                <p v-for='(item, index) in result.current.lines.stable_version' :key='`current-${index}`'>
-                    {{item}}
-                </p>
+                <div>
+                    <p v-for='(item, index) in result.current.lines.stable_version' :key='`current-${index}`'>
+                        {{item}}
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class='diagram-container__item'>
-            {{result.next.secondary.shape}}{{result.next.primary.shape}}
-            {{result.next.name}}
+            <div class='diagram-container__item'>
+                {{result.next.secondary.shape}}{{result.next.primary.shape}}
+                {{result.next.name}}
 
-            <p>{{result.next.description}}</p>
+                <p>{{result.next.description}}</p>
 
-            <div>
-                <p v-for='(item, index) in result.next.lines.stable_version' :key='`next-${index}`'>
-                    {{item}}
-                </p>
+                <div>
+                    <p v-for='(item, index) in result.next.lines.stable_version' :key='`next-${index}`'>
+                        {{item}}
+                    </p>
+                </div>
             </div>
         </div>
     </div>
