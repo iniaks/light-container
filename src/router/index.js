@@ -19,6 +19,11 @@ const routes = [
     path: '/create/:group',
     name: 'create',
     component: () => import('../views/Combination/index.vue')
+  },
+  {
+    path: '/enlighten/:number',
+    name: 'enlighten',
+    component: () => import('../views/Enlighten/index.vue')
   }
   //{
     // path: '/about',
