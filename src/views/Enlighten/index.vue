@@ -1,5 +1,6 @@
 <template>
     <div class='diagram-container' v-if='result.current'>
+        <p>动爻：{{result.change_index}}</p>
         <div class='diagram-container__item'>
             {{result.current.secondary.shape}}{{result.current.primary.shape}}
             {{result.current.name}}
