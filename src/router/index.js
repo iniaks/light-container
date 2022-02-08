@@ -24,6 +24,11 @@ const routes = [
     path: '/enlighten/:number',
     name: 'enlighten',
     component: () => import('../views/Enlighten/index.vue')
+  },
+  {
+    path: '/reading',
+    name: 'reading',
+    component: () => import('../views/Reading/index.vue')
   }
   //{
     // path: '/about',
