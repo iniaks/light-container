@@ -29,6 +29,11 @@ const routes = [
     path: '/reading',
     name: 'reading',
     component: () => import('../views/Reading/index.vue')
+  },
+  {
+    path: '/osu',
+    name: 'osu',
+    component: () => import('../views/Osu/index.vue')
   }
   //{
     // path: '/about',

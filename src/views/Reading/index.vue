@@ -5,6 +5,8 @@
             <span v-for='(char, index) in context' :key='`context-${index}`' :class='["reading-char",
             hides.indexOf(index) >= 0 ? "reading" : "",
             index == cursor ? "sliding" : "",
+            corrects.indexOf(index) >= 0 ? "correct" : "",
+            misses.indexOf(index) >= 0 ? "miss" : "",
             char == "\n" ? "enter" : ""]'>
                 {{char}}
             </span>
@@ -14,6 +16,17 @@
             <div class='reading-opts__btn' @click='pause'>暂停</div>
             <div class='reading-opts__btn' @click='turn(-1)' v-if='page > 0'>上一页</div>
             <div class='reading-opts__btn' @click='turn(1)' v-if='page < book.length - 1'>下一页</div>
+            <div class='reading-opts__btn' @click='play'>开始</div>
+            <div class='reading-opts__btn'>
+                <span :class='[hits.word ? "show" : ""]'>句</span>
+                <span :class='[hits.comma ? "show" : ""]'>读</span>
+            </div>
+            <div class='reading-opts__btn'>
+                正确：{{board.correct}}
+            </div>
+            <div class='reading-opts__btn'>
+                错误：{{board.miss}}
+            </div>
         </div>
     </div>
 </template>
@@ -21,7 +34,7 @@
 <script>
     import axios from 'axios'
     import { API_HOST } from '@/store/config'
-    // import { TEST_CONTEXT } from './test'
+    import { TEST_CONTEXT } from './test'
 
     export default {
         data () {
@@ -35,9 +48,53 @@
                 hides: [],
                 mode: '',
                 page: 0,
+                commas: ['，', '。', '：', '”', '“', '；', '《', '》'],
+                hits: {
+                    word: false,
+                    comma: false
+                },
+                board: {
+                    correct: 0,
+                    miss: 0
+                },
+                corrects: [],
+                misses: []
             }
         },
         methods: {
+            play () {
+                this.setkey()
+                this.recover()
+            },
+            check () {
+                const char = this.context[this.count]
+                if (this.commas.indexOf(char) >= 0) return 'comma'
+                else return 'word'
+            },
+            deal (type) {
+                const that = this
+                this.hits[type] = true
+                if (this.check() == type) {
+                    this.corrects.push(this.count)
+                    this.board.correct++
+                } else {
+                    this.misses.push(this.count)
+                    this.board.miss++
+                }
+                setTimeout(() => {
+                    this.hits[type] = false
+                }, 100)
+            },
+            setkey () {
+                const that = this
+                window.addEventListener('keypress', (e) => {
+                    if (e.code == 'KeyZ') {
+                        that.deal('word')
+                    } else if (e.code == 'KeyX') {
+                        that.deal('comma')
+                    }
+                })
+            },
             init (query) {
                 const that = this
                 axios.get(`${API_HOST}/reading/book?addr=${this.$route.query.addr}`).then((res => {
@@ -57,13 +114,15 @@
                 // console.log(this.book)
             },
             read () {
-                if (this.mode == 'disappear') {
-                    this.disappear()
-                } else if (this.mode == 'recovering') {
-                    this.recover()
-                } else {
-                    this.appear()
-                }
+                // if (this.mode == 'disappear') {
+                //     this.disappear()
+                // } else if (this.mode == 'recovering') {
+                //     this.recover()
+                // } else {
+                //     this.appear()
+                // }
+
+                this.recover()
             },
             recover () {
                 const that = this
@@ -74,9 +133,9 @@
                         that.hides.push(that.count)
                     } else {
                         clearInterval(that.timer)
-                        that.disappear()
+                        // that.disappear()
                     }
-                }, 200)
+                }, 500)
             },
             appear () {
                 const that = this
@@ -113,11 +172,12 @@
                 this.cursor = -1
                 this.mode = ''
                 clearInterval(this.timer)
-
             }
         },
         mounted () {
-            this.init()
+            // this.init()
+            this.context = TEST_CONTEXT.join('\n')
+            this.setkey()
         }
     }
 </script>
@@ -142,8 +202,9 @@
             font-size: 18px;
             margin-bottom: 8px;
             box-sizing: border-box;
-            transition: all .8s ease;
+            transition: all .5s ease;
             opacity: 0.02;
+            border: 1px solid transparent;
             &.reading {
                 opacity: 1;
             }
@@ -155,6 +216,12 @@
                 display: block;
                 margin-bottom: 12px;
             }
+            &.correct {
+                color: blue;
+            }
+            &.miss {
+                color: red;
+            }
         }
         .reading-opts {
             position: absolute;
@@ -163,6 +230,13 @@
             margin-top: 20px;
             .reading-opts__btn {
                 cursor: pointer;
+                span {
+                    opacity: 0;
+                    transition: all .1s ease;
+                }
+                .show {
+                  opacity: 1;  
+                }
             }
         }
     }
