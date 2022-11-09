@@ -34,6 +34,21 @@ const routes = [
     path: '/osu',
     name: 'osu',
     component: () => import('../views/Osu/index.vue')
+  },
+  {
+    path: '/clock',
+    name: 'clock',
+    component: () => import('../views/Clock/index.vue')
+  },
+  {
+    path: '/timeline',
+    name: 'timeline',
+    component: () => import('../views/Timeline/index.vue')
+  },
+  {
+    path: '/curve',
+    name: 'curve',
+    component: () => import('../views/Curve/index.vue')
   }
   //{
     // path: '/about',

@@ -23,6 +23,9 @@
             <div class='reading-opts__btn'>命中：{{board.hits}}</div>
             <div class='reading-opts__btn'>失误：{{board.errors}}</div>
             <div class='reading-opts__btn'>遗漏：{{board.misses}}</div>
+            <div class='reading-opts__btn'>连击：{{combo}}</div>
+            <div class='reading-opts__btn'>最长连击：{{max_combo}}</div>
+            <div class='reading-opts__btn'>连击次数：{{board.combos}}</div>
         </div>
     </div>
 </template>
@@ -43,7 +46,11 @@
                 rounds: [],
                 cursor: -1,
                 page: 0,
-                commas: ['，', '。', '：', '”', '“', '；', '《', '》'],
+                commas: ['，', '。', '：', '”', '“', '；', '《', '》', '？', '、', '！'],
+                playing: false,
+                combo: 0,
+                max_combo: 0,
+                combos: []
             }
         },
         computed: {
@@ -51,7 +58,8 @@
                 return {
                     hits: this.rounds.filter(item => item.value != '\n' && item.correct).length,
                     errors: this.rounds.filter(item => item.value != '\n' && item.wrong).length,
-                    misses: this.rounds.filter(item => item.value != '\n' && item.missed).length
+                    misses: this.rounds.filter(item => item.value != '\n' && item.missed).length,
+                    combos: this.combos.length
                 }
             }
         },
@@ -75,6 +83,7 @@
                 })
             },
             pause () {
+                this.playing = false
                 clearInterval(this.clock)
             },
             check (char) {
@@ -92,33 +101,49 @@
                     })
                 }
             },
+            clear () {
+                if (this.combo > 0) {
+                    this.combos.push(this.combo)
+                    if (this.combo > this.max_combo) this.max_combo = this.combo
+                    this.combo = 0
+                }
+            },
             next () {
                 const that = this
+                this.playing = true
                 this.clock = setInterval(() => {
-                    if (!that.rounds[that.cursor].pressed) {
+                    if (that.cursor < that.rounds.length && !that.rounds[that.cursor].pressed) {
                         that.rounds[that.cursor].missed = true
+                        that.clear()
                     }
                     if (that.cursor < that.rounds.length) {
                         that.cursor++
                     } else {
+                        that.clear()
                         clearInterval(that.clock)
                     }
-                }, 500)
+                }, 350)
             },
             press (type) {
-                const char = this.rounds[this.cursor].value
-                if (!this.rounds[this.cursor].pressed) {
-                    if (this.check(char) == type) {
-                        this.rounds[this.cursor].correct = true
-                    } else {
-                        this.rounds[this.cursor].wrong = true
+                // console.log(this.cursor)
+                if (this.cursor >= 0) {
+                    const char = this.rounds[this.cursor].value
+                    if (!this.rounds[this.cursor].pressed) {
+                        if (this.check(char) == type) {
+                            this.rounds[this.cursor].correct = true
+                            this.combo++
+                        } else {
+                            this.rounds[this.cursor].wrong = true
+                            this.clear()
+                        }
+                        this.rounds[this.cursor].pressed = true
                     }
-                    this.rounds[this.cursor].pressed = true
                 }
                 // this.next()
             },
             start () {
                 this.cursor = 0
+                this.playing = true
                 this.next()
             },
             turn (direction) {
@@ -134,11 +159,20 @@
         mounted () {
             this.view()
             const that = this
-            window.addEventListener('keypress', (e) => {
+            window.addEventListener('keydown', (e) => {
+                console.log(e.code)
                 if (e.code == 'KeyZ') {
                     that.press('word')
                 } else if (e.code == 'KeyX') {
                     that.press('comma')
+                } else if (e.code == 'Space') {
+                    if (that.playing) {
+                        that.pause()
+                    } else if (this.cursor == -1) {
+                        that.start()
+                    } else {
+                        that.next()
+                    }
                 }
             })
         }
@@ -166,7 +200,7 @@
             margin-bottom: 8px;
             box-sizing: border-box;
             transition: all .5s ease;
-            opacity: 0.02;
+            opacity: 0.1;
             border: 1px solid transparent;
             position: relative;
             &.current {
@@ -185,7 +219,7 @@
                 }
             }
             &.near {
-                opacity: 0.2;
+                opacity: 0.5;
             }
             &.missing {
                 opacity: .5;
@@ -220,7 +254,7 @@
         }
         .reading-opts {
             position: absolute;
-            right: -80px;
+            right: -100px;
             top: 150px;
             margin-top: 20px;
             .reading-opts__btn {

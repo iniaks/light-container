@@ -1,32 +1,21 @@
 <template>
     <div class='reading-container'>
-        <div class='reading-context'>
-            <h2>{{book_title}}</h2>
-            <span v-for='(char, index) in context' :key='`context-${index}`' :class='["reading-char",
-            hides.indexOf(index) >= 0 ? "reading" : "",
-            index == cursor ? "sliding" : "",
-            corrects.indexOf(index) >= 0 ? "correct" : "",
-            misses.indexOf(index) >= 0 ? "miss" : "",
-            char == "\n" ? "enter" : ""]'>
-                {{char}}
-            </span>
-        </div>
-        <div class='reading-opts'>
-            <div class='reading-opts__btn' @click='read'>{{hides.length > 0 || cursor >= 0 ? '继续' : '开始阅读'}}</div>
-            <div class='reading-opts__btn' @click='pause'>暂停</div>
-            <div class='reading-opts__btn' @click='turn(-1)' v-if='page > 0'>上一页</div>
-            <div class='reading-opts__btn' @click='turn(1)' v-if='page < book.length - 1'>下一页</div>
-            <div class='reading-opts__btn' @click='play'>开始</div>
-            <div class='reading-opts__btn'>
-                <span :class='[hits.word ? "show" : ""]'>句</span>
-                <span :class='[hits.comma ? "show" : ""]'>读</span>
-            </div>
-            <div class='reading-opts__btn'>
-                正确：{{board.correct}}
-            </div>
-            <div class='reading-opts__btn'>
-                错误：{{board.miss}}
-            </div>
+        <div class='reading-context' v-if='book'>
+            <h2>{{book.title}}</h2>
+            <button @click="learn(0.1)" style="margin-right: 10px">学习</button>
+            <button @click="complete">全显</button>
+            <p class="reading-paragraph">
+                <span v-for="(item, index) in book_map"
+                :key="`word-${index}`"
+                :style="{borderBottomColor: item.isHide ? '#333' : 'transparent',
+                display: item.isWrap ? 'block' : 'inline-block'}"
+                class="reading-word">
+                    <span v-if="!item.isWrap" :style="{opacity: item.isHide ? '0' : '1'}">{{item.char}}</span>
+                    <input v-model="item.context" v-if='item.isHide' class='reading-input'
+                    :style='{color: item.char == item.context || item.context == "" ? "#333" : "red"}'/>
+                    <span class="reading-toggle" v-if='item.isHide' @click='toggle(index)'/>
+                </span>
+            </p>
         </div>
     </div>
 </template>
@@ -34,150 +23,97 @@
 <script>
     import axios from 'axios'
     import { API_HOST } from '@/store/config'
-    import { TEST_CONTEXT } from './test'
+    // import { TEST_CONTEXT } from './test'
 
     export default {
         data () {
             return {
-                timer: null,
-                book_title: '',
-                book: [],
-                context: '',
-                count: -1,
-                cursor: -1,
-                hides: [],
-                mode: '',
-                page: 0,
-                commas: ['，', '。', '：', '”', '“', '；', '《', '》'],
-                hits: {
-                    word: false,
-                    comma: false
-                },
-                board: {
-                    correct: 0,
-                    miss: 0
-                },
-                corrects: [],
-                misses: []
+                book: null,
+                book_map: []
             }
         },
         methods: {
-            play () {
-                this.setkey()
-                this.recover()
-            },
-            check () {
-                const char = this.context[this.count]
-                if (this.commas.indexOf(char) >= 0) return 'comma'
-                else return 'word'
-            },
-            deal (type) {
+            generate () {
                 const that = this
-                this.hits[type] = true
-                if (this.check() == type) {
-                    this.corrects.push(this.count)
-                    this.board.correct++
-                } else {
-                    this.misses.push(this.count)
-                    this.board.miss++
-                }
-                setTimeout(() => {
-                    this.hits[type] = false
-                }, 100)
-            },
-            setkey () {
-                const that = this
-                window.addEventListener('keypress', (e) => {
-                    if (e.code == 'KeyZ') {
-                        that.deal('word')
-                    } else if (e.code == 'KeyX') {
-                        that.deal('comma')
+                this.book.content.forEach((para, pindex) => {
+                    for (let i = 0; i<para.length; i++) {
+                        that.book_map.push({
+                            char: para[i],
+                            cindex: i,
+                            para: pindex,
+                            isChar: /[\u4E00-\u9FA5]/.test(para[i]),
+                            isWrap: false,
+                            isHide: false,
+                            context: ''
+                        })
                     }
+                    that.book_map.push({
+                        char: '',
+                        cindex: para.length,
+                        para: pindex,
+                        isChar: false,
+                        isWrap: true,
+                        isHide: false,
+                        context: ''
+                    })
                 })
             },
-            init (query) {
+            init () {
                 const that = this
                 axios.get(`${API_HOST}/reading/book?addr=${this.$route.query.addr}`).then((res => {
-                    that.book_title = res.data.title
-                    that.separate(res.data.content)
-                    that.context = that.book[that.page].join('\n')
-                    // console.log(that.context)
+                    that.book = res.data
+                    that.generate()
                 })).catch(err => {
                     return err
                 })
             },
-            separate (paras) {
-                const capacity = 5
-                for (let i = 0; i < paras.length; i+=capacity) {
-                    this.book.push(paras.slice(i, i+capacity))
+            random (min, max) {
+                return Math.floor(Math.random() * (max - min)) + min
+            },
+            learn (percent) {
+                const that = this
+                const max = this.book_map.length
+                const capacity = Math.floor(max * percent)
+                const allowance = this.book_map.filter(item => !item.isHide && item.isChar).length
+                this.reset()
+                if (allowance == 0) {
+                    return
+                } else if (allowance <= capacity) {
+                    this.book_map.forEach(item => {
+                        if (item.isChar) item.isHide = true
+                    })
+                } else {
+                    const hides = []
+                    while (hides.length < capacity) {
+                        const index = this.random(0, max)
+                        if (this.book_map[index].isChar && !this.book_map[index].isHide && hides.indexOf(index) < 0) {
+                            hides.push(index)
+                        }
+                    }
+                    hides.forEach(index => {
+                        that.book_map[index].isHide = true
+                    })
                 }
-                // console.log(this.book)
             },
-            read () {
-                // if (this.mode == 'disappear') {
-                //     this.disappear()
-                // } else if (this.mode == 'recovering') {
-                //     this.recover()
-                // } else {
-                //     this.appear()
-                // }
-
-                this.recover()
+            toggle (index) {
+                this.book_map[index].context = this.book_map[index].context == this.book_map[index].char
+                ? ''
+                : this.book_map[index].char
             },
-            recover () {
-                const that = this
-                this.mode = 'recovering'
-                that.timer = setInterval(() => {
-                    if (that.count <= that.context.length) {
-                        that.count++
-                        that.hides.push(that.count)
-                    } else {
-                        clearInterval(that.timer)
-                        // that.disappear()
-                    }
-                }, 500)
+            complete () {
+                this.book_map.forEach(item => {
+                    item.isHide = false
+                })
+                this.reset()
             },
-            appear () {
-                const that = this
-                this.mode = 'reading'
-                this.timer = setInterval(() => {
-                    if (that.cursor <= that.context.length) that.cursor++
-                    else {
-                        clearInterval(that.timer)
-                        that.recover()
-                    }
-                }, 250)
-            },
-            disappear () {
-                const that = this
-                this.mode = 'disappear'
-                this.timer = setInterval(() => {
-                    if (that.hides.length > 0) that.hides.shift()
-                    else {
-                        clearInterval(that.timer)
-                        that.count = -1
-                        that.cursor = -1
-                    }
-                }, 200)
-            },
-            pause () {
-                clearInterval(this.timer)
-                // this.timer()
-            },
-            turn (direction) {
-                this.page = this.page + direction
-                this.context = this.book[this.page].join('\n')
-                this.hides = []
-                this.count = -1
-                this.cursor = -1
-                this.mode = ''
-                clearInterval(this.timer)
+            reset () {
+                this.book_map.forEach(item => {
+                    item.context = ''
+                })
             }
         },
         mounted () {
-            // this.init()
-            this.context = TEST_CONTEXT.join('\n')
-            this.setkey()
+            this.init()
         }
     }
 </script>
@@ -188,56 +124,53 @@
         margin: 0 auto;
         position: relative;
         background: #f3f4f5;
-        .reading-context {
-            height: 100vh;
-            box-sizing: border-box;
-            padding: 30px 15px;
-            overflow-y: auto;
-        }
-        .reading-char {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            line-height: 20px;
-            font-size: 18px;
-            margin-bottom: 8px;
-            box-sizing: border-box;
-            transition: all .5s ease;
-            opacity: 0.02;
-            border: 1px solid transparent;
-            &.reading {
-                opacity: 1;
+        padding: 30px 15px;
+        box-sizing: border-box;
+        .reading-paragraph {
+            color: #333;
+            line-height: 2em;
+            transition: all .3s ease;
+            word-break: break-all;
+            font-size: 13pt;
+            span {
+                transition: all ease .3s;
+                border-bottom: 1px solid transparent;
             }
-            &.sliding {
-                font-size: 20px;
-                opacity: 1;
+            .spot {
+                background-color: yellowgreen;
             }
-            &.enter {
-                display: block;
-                margin-bottom: 12px;
-            }
-            &.correct {
-                color: blue;
-            }
-            &.miss {
-                color: red;
-            }
-        }
-        .reading-opts {
-            position: absolute;
-            right: -80px;
-            bottom: 150px;
-            margin-top: 20px;
-            .reading-opts__btn {
-                cursor: pointer;
-                span {
-                    opacity: 0;
-                    transition: all .1s ease;
+            .reading-word {
+                position: relative;
+                margin: 5px 0;
+                .reading-input {
+                    outline: none;
+                    position: absolute;
+                    left: -2px;
+                    top: -2px;
+                    width: 100%;
+                    height: 100%;
+                    line-height: 2em;
+                    background: transparent;
+                    border: none;
+                    font-size: 13pt;
+                    font-family: 'Times';
                 }
-                .show {
-                  opacity: 1;  
+                .reading-toggle {
+                    position: absolute;
+                    top: -2px;
+                    width: 4px;
+                    height: 4px;
+                    border-radius: 100%;
+                    left: calc((100% - 4px) / 2);
+                    background: #333;
+                    cursor: pointer;
                 }
             }
+        }
+    }
+    @media screen and ( max-width: 1080px )  {
+        .reading-container {
+            width: 100%;
         }
     }
 </style>
