@@ -130,7 +130,7 @@
         box-sizing: border-box;
         .reading-paragraph {
             color: #333;
-            line-height: 2em;
+            line-height: 1.5em;
             transition: all .3s ease;
             word-break: break-all;
             font-size: 13pt;
@@ -143,7 +143,6 @@
             }
             .reading-word {
                 position: relative;
-                margin: 5px 0;
                 cursor: pointer;
                 .reading-input {
                     outline: none;
@@ -152,7 +151,7 @@
                     top: -2px;
                     width: 100%;
                     height: 100%;
-                    line-height: 2em;
+                    line-height: 1.5em;
                     background: transparent;
                     border: none;
                     font-size: 13pt;
