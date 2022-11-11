@@ -144,6 +144,7 @@
             .reading-word {
                 position: relative;
                 margin: 5px 0;
+                cursor: pointer;
                 .reading-input {
                     outline: none;
                     position: absolute;
@@ -156,7 +157,6 @@
                     border: none;
                     font-size: 13pt;
                     font-family: 'Times';
-                    cursor: pointer;
                 }
                 .reading-toggle {
                     position: absolute;
