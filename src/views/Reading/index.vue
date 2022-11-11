@@ -9,9 +9,8 @@
                 :key="`word-${index}`"
                 :style="{borderBottomColor: item.isHide ? '#333' : 'transparent',
                 display: item.isWrap ? 'block' : 'inline-block'}"
-                class="reading-word"
-                @click='toggle(index)'>
-                    <span v-if="!item.isWrap" :style="{opacity: item.isHide ? '0' : '1'}">{{item.char}}</span>
+                class="reading-word">
+                    <span :class="[item.isHide ? 'hide' : '']" v-if="!item.isWrap">{{item.char}}</span>
                     <!-- <input v-model="item.context" v-if='item.isHide' class='reading-input'
                     :style='{color: item.char == item.context || item.context == "" ? "#333" : "red"}'/>
                     <span class="reading-toggle" v-if='item.isHide' @click='toggle(index)'/> -->
@@ -166,6 +165,12 @@
                     left: calc((100% - 4px) / 2);
                     background: #333;
                     cursor: pointer;
+                }
+            }
+            .hide {
+                opacity: 0;
+                &:hover {
+                    opacity: 1;
                 }
             }
         }
