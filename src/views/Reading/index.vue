@@ -9,11 +9,12 @@
                 :key="`word-${index}`"
                 :style="{borderBottomColor: item.isHide ? '#333' : 'transparent',
                 display: item.isWrap ? 'block' : 'inline-block'}"
-                class="reading-word">
+                class="reading-word"
+                @click='toggle(index)'>
                     <span v-if="!item.isWrap" :style="{opacity: item.isHide ? '0' : '1'}">{{item.char}}</span>
-                    <input v-model="item.context" v-if='item.isHide' class='reading-input'
+                    <!-- <input v-model="item.context" v-if='item.isHide' class='reading-input'
                     :style='{color: item.char == item.context || item.context == "" ? "#333" : "red"}'/>
-                    <span class="reading-toggle" v-if='item.isHide' @click='toggle(index)'/>
+                    <span class="reading-toggle" v-if='item.isHide' @click='toggle(index)'/> -->
                 </span>
             </p>
         </div>
@@ -96,15 +97,16 @@
                 }
             },
             toggle (index) {
-                this.book_map[index].context = this.book_map[index].context == this.book_map[index].char
-                ? ''
-                : this.book_map[index].char
+                // this.book_map[index].context = this.book_map[index].context == this.book_map[index].char
+                // ? ''
+                // : this.book_map[index].char
+                this.book_map[index].isHide = !this.book_map[index].isHide
             },
             complete () {
                 this.book_map.forEach(item => {
                     item.isHide = false
                 })
-                this.reset()
+                // this.reset()
             },
             reset () {
                 this.book_map.forEach(item => {
@@ -154,6 +156,7 @@
                     border: none;
                     font-size: 13pt;
                     font-family: 'Times';
+                    cursor: pointer;
                 }
                 .reading-toggle {
                     position: absolute;
