@@ -1,9 +1,10 @@
 <template>
     <div class='reading-container'>
-        <div class='reading-context' v-if='book'>
-            <h2>{{book.title}}</h2>
+        <div class='reading-context' v-if='book_map.length > 0'>
+            <h2>{{book_title}}</h2>
             <button @click="learn(0.1)" style="margin-right: 10px">学习</button>
             <button @click="complete">全显</button>
+            <br/>
             <p class="reading-paragraph">
                 <span v-for="(item, index) in book_map"
                 :key="`word-${index}`"
@@ -23,19 +24,24 @@
 <script>
     import axios from 'axios'
     import { API_HOST } from '@/store/config'
-    // import { TEST_CONTEXT } from './test'
+    //import { TEST_CONTEXT } from './test'
+    // import LetterDisk from './_disk'
 
     export default {
+        // components: {
+        //     LetterDisk
+        // },
         data () {
             return {
-                book: null,
-                book_map: []
+                book_title: '',
+                book_map: [],
+                // test: TEST_CONTEXT
             }
         },
         methods: {
-            generate () {
+            generate (content) {
                 const that = this
-                this.book.content.forEach((para, pindex) => {
+                content.forEach((para, pindex) => {
                     for (let i = 0; i<para.length; i++) {
                         that.book_map.push({
                             char: para[i],
@@ -61,8 +67,8 @@
             init () {
                 const that = this
                 axios.get(`${API_HOST}/reading/book?addr=${this.$route.query.addr}`).then((res => {
-                    that.book = res.data
-                    that.generate()
+                    that.book_title = res.data.title
+                    that.generate(res.data.content)
                 })).catch(err => {
                     return err
                 })
@@ -115,6 +121,7 @@
         },
         mounted () {
             this.init()
+            // this.generate(this.test)
         }
     }
 </script>
