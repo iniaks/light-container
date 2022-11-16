@@ -126,7 +126,7 @@
         margin: 0 auto;
         position: relative;
         background: #f3f4f5;
-        padding: 30px 15px;
+        padding: 30px 50px;
         box-sizing: border-box;
         .reading-paragraph {
             color: #333;
