@@ -5,18 +5,12 @@
             <button @click="learn(0.1)" style="margin-right: 10px">学习</button>
             <button @click="complete">全显</button>
             <br/>
-            <p class="reading-paragraph">
-                <span v-for="(item, index) in book_map"
+            <div class="reading-paragraph">
+                <context-char v-for="(item, index) in book_map"
                 :key="`word-${index}`"
-                :style="{borderBottomColor: item.isHide ? '#333' : 'transparent',
-                display: item.isWrap ? 'block' : 'inline-block'}"
-                class="reading-word">
-                    <span :class="[item.isHide ? 'hide' : '']" v-if="!item.isWrap">{{item.char}}</span>
-                    <!-- <input v-model="item.context" v-if='item.isHide' class='reading-input'
-                    :style='{color: item.char == item.context || item.context == "" ? "#333" : "red"}'/>
-                    <span class="reading-toggle" v-if='item.isHide' @click='toggle(index)'/> -->
-                </span>
-            </p>
+                :letter="item"
+                :book="book_map"/>
+                </div>
         </div>
     </div>
 </template>
@@ -24,13 +18,13 @@
 <script>
     import axios from 'axios'
     import { API_HOST } from '@/store/config'
-    //import { TEST_CONTEXT } from './test'
-    // import LetterDisk from './_disk'
+    // import { TEST_CONTEXT } from './test'
+    import ContextChar from './_disk'
 
     export default {
-        // components: {
-        //     LetterDisk
-        // },
+        components: {
+            ContextChar
+        },
         data () {
             return {
                 book_title: '',
@@ -140,6 +134,7 @@
             transition: all .3s ease;
             word-break: break-all;
             font-size: 13pt;
+            margin: 15px 0;
             span {
                 transition: all ease .3s;
                 border-bottom: 1px solid transparent;

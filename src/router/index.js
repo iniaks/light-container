@@ -49,7 +49,12 @@ const routes = [
     path: '/curve',
     name: 'curve',
     component: () => import('../views/Curve/index.vue')
-  }
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: () => import('../views/Reading/_disk.vue')
+  },
   //{
     // path: '/about',
     // name: 'About',
