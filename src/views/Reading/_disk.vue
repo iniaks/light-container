@@ -1,12 +1,13 @@
 <template>
+    <div v-if="letter.isWrap"></div>
     <!-- <div style="padding: 100px"> -->
-    <div class="letter-container" v-if="letter" :style="{display: letter && letter.isWrap ? 'block' : 'inline-block'}">
+    <div class="letter-container" v-else>
         <span v-if="!letter.isHide" class="letter-context">{{letter.char}}</span>
         <span v-else @mousedown="active" class="letter-context" :style="{borderColor: '#333', color: letter.context == letter.char || letter.context == '' ? '#333' : 'red'}">
             {{letter.context ? letter.context : '?' }}
         </span>
 
-        <div class="disk-wrapper" v-if="toggle" @mouseup="complete">
+        <div class="disk-wrapper" v-if="toggle && item.isHide" @mouseup="complete">
             <div class="disk-container">
                 <div class="disk-center"></div>
                 
@@ -88,6 +89,7 @@
         box-sizing: border-box;
         cursor: pointer;
         user-select: none;
+        display: inline-block;
         .letter-context {
             width: 20px;
             height: 20px;
