@@ -7,7 +7,7 @@
             {{letter.context ? letter.context : '?' }}
         </span>
 
-        <div class="disk-wrapper" v-if="toggle && item.isHide" @mouseup="complete">
+        <div class="disk-wrapper" v-if="toggle && letter.isHide" @mouseup="complete">
             <div class="disk-container">
                 <div class="disk-center"></div>
                 
