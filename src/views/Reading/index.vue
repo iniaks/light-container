@@ -127,10 +127,13 @@
                 })
             },
             check () {
-                const allowance = this.book_map.filter(item => item.isHide && (item.content == '' || item.content != item.char)).length
+                const allowance = this.book_map.filter(item => item.isHide && (item.context == '' || item.context != item.char)).length
+                console.log(allowance)
                 if (allowance <= 0) {
                     const endTime = new Date()
                     window.alert(`完成！耗时${(endTime.getTime() - this.startTime.getTime()) / 1000}秒！`)
+                    this.complete()
+                    this.reset()
                 }
             }
         },
