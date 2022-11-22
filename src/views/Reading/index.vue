@@ -2,8 +2,15 @@
     <div class='reading-container'>
         <div class='reading-context' v-if='book_map.length > 0'>
             <h2>{{book_title}}</h2>
-            <button @click="learn(0.1)" style="margin-right: 10px">学习</button>
-            <button @click="complete">全显</button>
+            <div class="reading-opts">
+                <button @click="learn(0.1)">青铜</button>
+                <button @click="learn(0.2)">白银</button>
+                <button @click="learn(0.4)">黄金</button>
+                <button @click="learn(0.6)">白金</button>
+                <button @click="learn(0.8)">钻石</button>
+                <button @click="learn(1)">大师</button>
+                <button @click="complete">全显</button>
+            </div>
             <br/>
             <div class="reading-paragraph">
                 <context-char v-for="(item, index) in book_map"
@@ -20,6 +27,7 @@
     import { API_HOST } from '@/store/config'
     // import { TEST_CONTEXT } from './test'
     import ContextChar from './_disk'
+    
 
     export default {
         components: {
@@ -29,6 +37,7 @@
             return {
                 book_title: '',
                 book_map: [],
+                clock: 0
                 // test: TEST_CONTEXT
             }
         },
@@ -71,6 +80,7 @@
                 return Math.floor(Math.random() * (max - min)) + min
             },
             learn (percent) {
+                this.complete()
                 const that = this
                 const max = this.book_map.length
                 const capacity = Math.floor(max * percent)
@@ -128,6 +138,11 @@
         background: #f3f4f5;
         padding: 30px 50px;
         box-sizing: border-box;
+        .reading-opts {
+            button {
+                margin-right: 10px;
+            }
+        }
         .reading-paragraph {
             color: #333;
             line-height: 1.5em;
