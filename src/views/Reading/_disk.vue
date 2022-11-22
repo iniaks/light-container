@@ -74,6 +74,7 @@
             choose (index) {
                 // console.log(index)
                 this.letter.context = this.list[index]
+                this.$emit('choose')
             }
         }
     }

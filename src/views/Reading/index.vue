@@ -16,7 +16,8 @@
                 <context-char v-for="(item, index) in book_map"
                 :key="`word-${index}`"
                 :letter="item"
-                :book="book_map"/>
+                :book="book_map"
+                v-on:choose='check'/>
                 </div>
         </div>
     </div>
@@ -37,7 +38,7 @@
             return {
                 book_title: '',
                 book_map: [],
-                clock: 0
+                startTime: null
                 // test: TEST_CONTEXT
             }
         },
@@ -92,6 +93,7 @@
                     this.book_map.forEach(item => {
                         if (item.isChar) item.isHide = true
                     })
+                    this.startTime = new Date()
                 } else {
                     const hides = []
                     while (hides.length < capacity) {
@@ -103,6 +105,7 @@
                     hides.forEach(index => {
                         that.book_map[index].isHide = true
                     })
+                    this.startTime = new Date()
                 }
             },
             toggle (index) {
@@ -118,9 +121,17 @@
                 // this.reset()
             },
             reset () {
+                this.startTime = null
                 this.book_map.forEach(item => {
                     item.context = ''
                 })
+            },
+            check () {
+                const allowance = this.book_map.filter(item => item.isHide && (item.content == '' || item.content != item.char)).length
+                if (allowance <= 0) {
+                    const endTime = new Date()
+                    window.alert(`完成！耗时${(endTime.getTime() - this.startTime.getTime()) / 1000}秒！`)
+                }
             }
         },
         mounted () {
