@@ -55,6 +55,11 @@ const routes = [
     name: 'test',
     component: () => import('../views/Reading/_disk.vue')
   },
+  {
+    path: '/books',
+    name: 'books',
+    component: () => import('../views/Books/index.vue')
+  }
   //{
     // path: '/about',
     // name: 'About',

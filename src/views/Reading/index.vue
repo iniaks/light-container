@@ -70,9 +70,9 @@
             },
             init () {
                 const that = this
-                axios.get(`${API_HOST}/reading/book?addr=${this.$route.query.addr}`).then((res => {
-                    that.book_title = res.data.title
-                    that.generate(res.data.content)
+                axios.get(`${API_HOST}/reading/article?urn=${this.$route.query.urn}`).then((res => {
+                    that.book_title = `${res.data.toptitle}·${res.data.title}`
+                    that.generate(res.data.fulltext)
                 })).catch(err => {
                     return err
                 })
