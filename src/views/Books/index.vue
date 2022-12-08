@@ -1,41 +1,29 @@
 <template>
     <div class="book-container">
         <div class="lib-list" style="flex: 1">
-            <div class="book-list">
-                <div v-for="(book, index) in list"
-                :key="`book-${index}`"
-                :class="['book-list__item', book.urn == current_book ? 'active' : '']"
-                @click="browse(book.urn)">
-                    {{book.title}}
+            <div style="float: left">
+                <div class="book-list">
+                    <div v-for="(book, index) in list"
+                    :key="`book-${index}`"
+                    :class="['book-list__item', book.urn == current_book ? 'active' : '']"
+                    @click="browse(book.urn)">
+                        {{book.title}}
+                    </div>
                 </div>
-            </div>
-            <div class="book-pagination">
-                <span
-                v-for="page in total_page"
-                :key="`page-${page}`" v-show="page - current < 10 && page - current > -10"
-                @click="view(page)"
-                :class="['book-page', page == current ? 'active' : '']">
-                    {{page}}
-                </span>
+                <div class="book-pagination">
+                    <span
+                    v-for="page in total_page"
+                    :key="`page-${page}`" v-show="page - current < 10 && page - current > -10"
+                    @click="view(page)"
+                    :class="['book-page', page == current ? 'active' : '']">
+                        {{page}}
+                    </span>
+                </div>
             </div>
         </div>
         <div class="content-list" style="flex: 2">
-            <div class="content-item"
-            v-for="(chapter, index) in contents"
-            :key="`chapter-${index}`">
-                <div class="main-contents" @click="read(chapter.urn)"
-                v-if="chapter.type == 'article'">
-                    {{chapter.name}}
-                </div>
-                <div v-else>{{chapter.name}}</div>
-
-                <div v-if="chapter.type == 'chapter'" class="sub-contents">
-                    <div v-for="(article, index) in chapter.contents"
-                    :key="`article-${index}`"
-                    @click="read(article.urn)">
-                        {{article.name}}
-                    </div>
-                </div>
+            <div style="float: left">
+                <book-content :branch='contents'/>
             </div>
         </div>
     </div>
@@ -44,8 +32,12 @@
 <script>
     import axios from 'axios'
     import { API_HOST } from '@/store/config'
+    import BookContent from './_content.vue'
 
     export default {
+        components: {
+            BookContent
+        },
         data () {
             return {
                 current: 0,
@@ -104,7 +96,7 @@
     }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
     .book-container {
         padding: 15px;
         display: flex;

@@ -1,7 +1,16 @@
 <template>
     <div class='reading-container'>
+        <div class="reading-chapters" v-if="chapter_list.length > 0">
+            <div v-for="(chapter, index) in chapter_list" :key="`chapter-${index}`"
+            @click="chap(index)"
+            :class="['reading-chapters__item', index == chapter_index ? 'active' : '']"
+            >
+                {{chapter.title}}
+            </div>
+        </div>
         <div class='reading-context' v-if='book_map.length > 0'>
             <h2>{{book_title}}</h2>
+            <h3 v-if="chapter_list.length > 0">{{chapter_list[chapter_index].title}}</h3>
             <div class="reading-opts">
                 <button @click="learn(0.1)">青铜</button>
                 <button @click="learn(0.2)">白银</button>
@@ -18,7 +27,7 @@
                 :letter="item"
                 :book="book_map"
                 v-on:choose='check'/>
-                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -38,13 +47,16 @@
             return {
                 book_title: '',
                 book_map: [],
-                startTime: null
+                startTime: null,
+                chapter_index: 0,
+                chapter_list: []
                 // test: TEST_CONTEXT
             }
         },
         methods: {
             generate (content) {
                 const that = this
+                this.book_map = []
                 content.forEach((para, pindex) => {
                     for (let i = 0; i<para.length; i++) {
                         that.book_map.push({
@@ -72,10 +84,21 @@
                 const that = this
                 axios.get(`${API_HOST}/reading/article?urn=${this.$route.query.urn}`).then((res => {
                     that.book_title = `${res.data.toptitle}·${res.data.title}`
-                    that.generate(res.data.fulltext)
+                    if (res.data.subcontents.length > 0) {
+                        that.chapter_list = res.data.subcontents
+                        that.chap(0)
+                    } else {
+                        that.generate(res.data.fulltext)
+                    }
                 })).catch(err => {
                     return err
                 })
+            },
+            chap (index) {
+                this.chapter_index = index
+                this.generate(this.chapter_list[this.chapter_index].fulltext)
+                this.complete()
+                this.reset()
             },
             random (min, max) {
                 return Math.floor(Math.random() * (max - min)) + min
@@ -146,12 +169,29 @@
 
 <style lang="less" scoped>
     .reading-container {
-        width: 960px;
-        margin: 0 auto;
-        position: relative;
-        background: #f3f4f5;
-        padding: 30px 50px;
+        display: flex;
         box-sizing: border-box;
+        .reading-context {
+            flex: 1;
+            background: #f3f4f5;
+            padding: 30px 50px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .reading-chapters {
+            height: 100vh;
+            box-sizing: border-box;
+            overflow-y: auto;
+            padding: 15px;
+            .reading-chapters__item {
+                margin-bottom: 15px;
+                cursor: pointer;
+                &.active {
+                    color: red;
+                }
+            }
+        }
         .reading-opts {
             button {
                 margin-right: 10px;
