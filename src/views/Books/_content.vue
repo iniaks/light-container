@@ -3,7 +3,10 @@
         <div class="content-item"
         v-for="(chapter, index) in branch"
         :key="`chapter-${index}`">
-            <div @click="read(chapter)">{{chapter.name}}</div>
+            <div>
+                <a :href="`/reading?urn=${chapter.urn}`" target="_blank" v-if="chapter.type == 'article'">{{chapter.name}}</a>
+                <span v-else>{{chapter.name}}</span>
+            </div>
 
             <div v-if="chapter.type == 'chapter'" class="sub-contents">
                 <book-chapters :branch='chapter.contents'/>
@@ -15,13 +18,6 @@
 <script>
     export default {
         name: 'book-chapters',
-        props: ['branch'],
-        methods: {
-            read (chapter) {
-                if (chapter.type == 'article') {
-                    window.open(`/reading?urn=${chapter.urn}`)
-                }
-            }
-        }
+        props: ['branch']
     }
 </script>
