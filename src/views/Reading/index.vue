@@ -8,25 +8,31 @@
                 {{chapter.title}}
             </div>
         </div>
-        <div class='reading-context' v-if='book_map.length > 0'>
-            <h2>{{book_title}}</h2>
-            <h3 v-if="chapter_list.length > 0">{{chapter_list[chapter_index].title}}</h3>
-            <div class="reading-opts">
-                <button @click="learn(0.1)">青铜</button>
-                <button @click="learn(0.2)">白银</button>
-                <button @click="learn(0.4)">黄金</button>
-                <button @click="learn(0.6)">白金</button>
-                <button @click="learn(0.8)">钻石</button>
-                <button @click="learn(1)">大师</button>
-                <button @click="complete">全显</button>
+        <div style="flex: 1" class="reading-main">
+            <div class='reading-context' v-if='book_map.length > 0'>
+                <h2>{{book_title}}</h2>
+                <h3 v-if="chapter_list.length > 0">{{chapter_list[chapter_index].title}}</h3>
+                <div class="reading-opts">
+                    <div @click="learn(0.1)">青铜</div>
+                    <div @click="learn(0.2)">白银</div>
+                    <div @click="learn(0.4)">黄金</div>
+                    <div @click="learn(0.6)">白金</div>
+                    <div @click="learn(0.8)">钻石</div>
+                    <div @click="learn(1)">大师</div>
+                    <div @click="complete">全显</div>
+                </div>
+                <br/>
+                <div class="reading-paragraph">
+                    <context-char v-for="(item, index) in book_map"
+                    :lindex="index"
+                    :key="`word-${index}`"
+                    :letter="item"
+                    :book="book_map"
+                    :current="hides[answer.current]"/>
+                </div>
             </div>
-            <br/>
-            <div class="reading-paragraph">
-                <context-char v-for="(item, index) in book_map"
-                :key="`word-${index}`"
-                :letter="item"
-                :book="book_map"
-                v-on:choose='check'/>
+            <div class="reading-bar">
+                <reading-bar :answer='answer' :book='book_map' :hides='hides' v-on:complete='check'/>
             </div>
         </div>
     </div>
@@ -37,11 +43,13 @@
     import { API_HOST } from '@/store/config'
     // import { TEST_CONTEXT } from './test'
     import ContextChar from './_disk'
+    import ReadingBar from './_bar'
     
 
     export default {
         components: {
-            ContextChar
+            ContextChar,
+            ReadingBar
         },
         data () {
             return {
@@ -49,7 +57,9 @@
                 book_map: [],
                 startTime: null,
                 chapter_index: 0,
-                chapter_list: []
+                chapter_list: [],
+                hides: [],
+                answer: { current: 0 }
                 // test: TEST_CONTEXT
             }
         },
@@ -118,15 +128,18 @@
                     })
                     this.startTime = new Date()
                 } else {
-                    const hides = []
-                    while (hides.length < capacity) {
+                    this.hides = []
+                    while (this.hides.length < capacity) {
                         const index = this.random(0, max)
-                        if (this.book_map[index].isChar && !this.book_map[index].isHide && hides.indexOf(index) < 0) {
-                            hides.push(index)
+                        if (this.book_map[index].isChar && !this.book_map[index].isHide && this.hides.indexOf(index) < 0) {
+                            this.hides.push(index)
                         }
                     }
-                    hides.forEach(index => {
-                        that.book_map[index].isHide = true
+                    this.hides.sort((a, b) => {
+                        return a-b
+                    })
+                    this.hides.forEach(i => {
+                        that.book_map[i].isHide = true
                     })
                     this.startTime = new Date()
                 }
@@ -141,17 +154,18 @@
                 this.book_map.forEach(item => {
                     item.isHide = false
                 })
-                // this.reset()
+                this.reset()
             },
             reset () {
                 this.startTime = null
+                this.answer.current = 0
                 this.book_map.forEach(item => {
                     item.context = ''
                 })
             },
             check () {
                 const allowance = this.book_map.filter(item => item.isHide && (item.context == '' || item.context != item.char)).length
-                console.log(allowance)
+                // console.log(allowance)
                 if (allowance <= 0) {
                     const endTime = new Date()
                     window.alert(`完成！耗时${(endTime.getTime() - this.startTime.getTime()) / 1000}秒！`)
@@ -171,13 +185,22 @@
     .reading-container {
         display: flex;
         box-sizing: border-box;
-        .reading-context {
-            flex: 1;
-            background: #f3f4f5;
-            padding: 30px 50px;
+        .reading-main {
+            display: flex;
+            flex-direction: column;
             height: 100vh;
             box-sizing: border-box;
+        }
+        .reading-context {
+            flex: 3;
+            background: #f3f4f5;
+            padding: 30px 50px;
+            box-sizing: border-box;
             overflow-y: auto;
+            min-height: 0;
+        }
+        .reading-bar {
+            flex: 1;
         }
         .reading-chapters {
             height: 100vh;
@@ -193,7 +216,8 @@
             }
         }
         .reading-opts {
-            button {
+            div {
+                display: inline-block;
                 margin-right: 10px;
             }
         }
